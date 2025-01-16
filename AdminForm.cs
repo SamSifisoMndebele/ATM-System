@@ -62,5 +62,23 @@ namespace ATM_System
 
             }
         }
+
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            Connection.GetConnection(connection =>
+            {
+                SqlCommand cmd = new SqlCommand(
+                    "UPDATE Users SET account_no=@account_no, first_names=@first_names, lastname=@lastname, pin=@pin, phone=@phone " +
+                    "WHERE account_no=@account_no", connection);
+                cmd.Parameters.AddWithValue("@account_no", txtAcctNo.Text);
+                cmd.Parameters.AddWithValue("@first_names", txtfnme.Text);
+                cmd.Parameters.AddWithValue("@lastname", txtlnme.Text);
+                cmd.Parameters.AddWithValue("@pin", txtPincode.Text);
+                cmd.Parameters.AddWithValue("@phone", txtPhone.Text);
+
+                cmd.ExecuteNonQuery();
+                cmd.Dispose();
+            });
+        }
     }
 }

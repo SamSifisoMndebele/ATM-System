@@ -17,10 +17,6 @@ namespace ATM_System
         {
             pinBox.PasswordChar = '*';
             datetime.Text = DateTime.Now.ToString();
-
-            // todo: remove
-            accountNoBox.Text = "admin";
-            pinBox.Text = "1111";
         }
 
         private void continueBtn_Click(object sender, EventArgs e)

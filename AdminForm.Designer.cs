@@ -80,6 +80,7 @@
             this.buttonSave.TabIndex = 23;
             this.buttonSave.Text = "SAVE";
             this.buttonSave.UseVisualStyleBackColor = false;
+            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
             // Label7
             // 
