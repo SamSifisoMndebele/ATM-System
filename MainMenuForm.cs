@@ -14,15 +14,15 @@ namespace ATM_System
         private void MainMenuForm_Load(object sender, System.EventArgs e)
         {
             datetime.Text = DateTime.Now.ToString();
-            SqlConnection con = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Application.StartupPath + "\\BankDatabase.mdf;Integrated Security=True");
-            con.Open();
-            string query = "SELECT CONCAT(first_names, ' ', lastname) FROM Users WHERE account_no=@account_no";
-            SqlCommand cmd = new SqlCommand(query, con);
-            var accountNo = Tag.ToString();
-            cmd.Parameters.AddWithValue("@account_no", accountNo);
-            userAccNo.Text = accountNo;
-            userName.Text = (string)cmd.ExecuteScalar();
-            cmd.Clone();
+            Connection.GetConnection(connection =>
+            {
+                SqlCommand cmd = new SqlCommand("SELECT CONCAT(first_names,' ',lastname) FROM Users WHERE account_no=@account_no", connection);
+                var accountNo = Tag.ToString();
+                cmd.Parameters.AddWithValue("@account_no", accountNo);
+                userAccNo.Text = accountNo;
+                userName.Text = (string)cmd.ExecuteScalar();
+                cmd.Dispose();
+            });
         }
 
         private void button3_Click(object sender, System.EventArgs e)

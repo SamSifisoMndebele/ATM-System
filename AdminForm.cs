@@ -38,33 +38,28 @@ namespace ATM_System
             }
             else
             {
-                SqlConnection con = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Application.StartupPath + "\\BankDatabase.mdf;Integrated Security=True");
-                con.Open();
-                string query = "SELECT account_no, first_names, lastname, balance, pin, phone FROM Users WHERE account_no=@account_no";
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@account_no", searchAccNo.Text);
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.HasRows)
+                Connection.GetConnection(connection =>
                 {
-                    string accNo = reader.GetString(0);
-                    string fName = reader.GetString(1);
-                    string lName = reader.GetString(2);
-                    string pin   = reader.GetString(3);
-                    double balance = reader.GetDouble(4);
-                    string phone = reader.GetString(5);
+                    SqlCommand cmd = new SqlCommand("SELECT account_no, first_names, lastname, pin, phone FROM Users WHERE account_no=@account_no", connection);
+                    cmd.Parameters.AddWithValue("@account_no", searchAccNo.Text);
 
-                    txtAcctNo.Text = accNo;
-                    txtfnme.Text = fName;
-                    txtlnme.Text = lName;
-                    txtPincode.Text = pin;
-                    txtPhone.Text = phone;
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            txtAcctNo.Text = reader.GetString(0);
+                            txtfnme.Text = reader.GetString(1);
+                            txtlnme.Text = reader.GetString(2);
+                            txtPincode.Text = reader.GetString(3);
+                            txtPhone.Text = reader.GetString(4);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Account Number Not found");
+                        }
+                    }
+                });
 
-                    reader.Close();
-                }
-                else
-                {
-                    MessageBox.Show("Account Number Not found");
-                }
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace ATM_System
@@ -29,35 +30,38 @@ namespace ATM_System
                 MessageBox.Show("Please enter your account number and PIN.");
             } else
             {
-                SqlConnection con = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Application.StartupPath + "\\BankDatabase.mdf;Integrated Security=True");
-                con.Open();
-                string query = "SELECT is_admin FROM Users WHERE account_no=@account_no AND pin=@pin";  
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@account_no", accountNoBox.Text);
-                cmd.Parameters.AddWithValue("@pin", pinBox.Text);
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.HasRows)
+                Connection.GetConnection(connection =>
                 {
-                    reader.Close();
-                    bool isAdmin = (bool)cmd.ExecuteScalar();
-                    if (isAdmin)
+                    SqlCommand cmd = new SqlCommand("SELECT is_admin FROM Users WHERE account_no=@account_no AND pin=@pin", connection);
+                    cmd.Parameters.AddWithValue("@account_no", accountNoBox.Text);
+                    cmd.Parameters.AddWithValue("@pin", pinBox.Text);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        AdminForm adminForm = new AdminForm();
-                        adminForm.Show();
-                        Hide();
-                    } else
-                    {
-                        MainMenuForm mainMenu = new MainMenuForm();
-                        mainMenu.Tag = accountNoBox.Text;
-                        mainMenu.Show();
-                        Hide();
+                        if (reader.Read())
+                        {
+                            bool isAdmin = reader.GetBoolean(0);
+                            if (isAdmin)
+                            {
+                                AdminForm adminForm = new AdminForm();
+                                adminForm.Show();
+                                Hide();
+                            }
+                            else
+                            {
+                                MainMenuForm mainMenu = new MainMenuForm();
+                                mainMenu.Tag = accountNoBox.Text;
+                                mainMenu.Show();
+                                Hide();
+                            }
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("Wrong Account number or PIN");
+                        }
                     }
-                    
-                } else
-                {
-                    MessageBox.Show("Wrong Account number or PIN");
-                }
-                con.Close();
+                });
             }
             
         }

@@ -23,12 +23,12 @@ namespace ATM_System
         private void WithdrawForm_Load(object sender, EventArgs e)
         {
             datetime.Text = DateTime.Now.ToString();
-            SqlConnection con = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Application.StartupPath + "\\BankDatabase.mdf;Integrated Security=True");
-            con.Open();
-            SqlCommand cmd = new SqlCommand("SELECT balance FROM Users WHERE account_no=@account_no", con);
-            cmd.Parameters.AddWithValue("@account_no", Tag.ToString());
-            balance = Convert.ToDouble(cmd.ExecuteScalar());
-            con.Close();
+            Connection.GetConnection(connection =>
+            {
+                SqlCommand cmd = new SqlCommand("SELECT balance FROM Users WHERE account_no=@account_no", connection);
+                cmd.Parameters.AddWithValue("@account_no", Tag.ToString());
+                balance = Convert.ToDouble(cmd.ExecuteScalar());
+            });
 
             if (balance < 500)
             {
@@ -49,7 +49,6 @@ namespace ATM_System
                 amount100.Enabled = false;
                 amount50.Enabled = false;
             }
-
         }
 
         private void cancelBtn_Click(object sender, EventArgs e)
@@ -76,19 +75,20 @@ namespace ATM_System
         {
             try
             {
-                SqlConnection con = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Application.StartupPath + "\\BankDatabase.mdf;Integrated Security=True");
-                con.Open();
-                SqlCommand cmd = new SqlCommand("UPDATE Users SET balance=@balance WHERE account_no=@account_no", con);
-                cmd.Parameters.AddWithValue("@account_no", Tag.ToString());
-                cmd.Parameters.AddWithValue("@balance", balance - amount);
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                con.Close();
+                Connection.GetConnection(connection =>
+                {
+                    SqlCommand cmd = new SqlCommand("UPDATE Users SET balance=@balance WHERE account_no=@account_no", connection);
+                    cmd.Parameters.AddWithValue("@account_no", Tag.ToString());
+                    cmd.Parameters.AddWithValue("@balance", balance - amount);
+                    cmd.ExecuteNonQuery();
+                    cmd.Dispose();
+                });
+
                 showReport(amount, balance - amount, true);
             }
             catch (Exception ex)
             {
-                showReport(amount, balance, false, "Transaction Not SUccesfull\nUnknown Error Occured.");
+                showReport(amount, balance, false, "Transaction Not SUccesfull\nUnknown Error Occured. \n\n"+ex.Message);
             }
         }
 

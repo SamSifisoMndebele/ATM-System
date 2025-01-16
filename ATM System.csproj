@@ -80,6 +80,7 @@
     <Compile Include="AdminForm.Designer.cs">
       <DependentUpon>AdminForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Connection.cs" />
     <Compile Include="DebositForm.cs">
       <SubType>Form</SubType>
     </Compile>
